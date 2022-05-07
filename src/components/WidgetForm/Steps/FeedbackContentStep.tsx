@@ -1,5 +1,5 @@
 import { ArrowLeft} from "phosphor-react";
-import { useState } from "react";
+import { FormEvent, useState } from "react";
 
 import { FeedbackType, feedbackTypes } from "..";
 
@@ -9,12 +9,26 @@ import { ScreenshotButton } from "../ScreenshotButton";
 interface FeedbackContentStepProps {
     feedbackType: FeedbackType;
     onFeedbackTypeRestartedRequested: () => void;
+    onFeedbackSent: () => void;
 }
 
-export function FeedbackContentStep({ feedbackType, onFeedbackTypeRestartedRequested }: FeedbackContentStepProps) {
+export function FeedbackContentStep({ feedbackType, onFeedbackTypeRestartedRequested, onFeedbackSent }: FeedbackContentStepProps) {
 
     const [screenshot, setScreenshot] = useState<string | null>(null);
+    const [comment, setComment] = useState('');
+
     const feedbackTypeInfo = feedbackTypes[feedbackType];
+
+    function handleSubmitFeedback(event: FormEvent) {
+
+        // para o evento do formulario
+        event.preventDefault();
+        console.log({
+            screenshot,
+            comment,
+        })
+        onFeedbackSent();
+    }
 
     return (
         <>
@@ -39,11 +53,12 @@ export function FeedbackContentStep({ feedbackType, onFeedbackTypeRestartedReque
 
             </header>
 
-            <form className="m-4 w-full">
+            <form onSubmit={handleSubmitFeedback} className="m-4 w-full">
                 <textarea
                     className="min-w-[304px] w-full min-h-[112px] text-sm placeholder-zinc-400 text-zinc-100  border-zinc-600 bg-transparent rounded-md 
                 focus:border-t-brand-500 focus:ring-brand-500 focus:ring-1 focus:outline-none resize-none scrollbar-thumb-zinc-700 scrollbar-track-transparent"
                     placeholder="Conte com detalhes o que está acontecendo....."
+                    onChange={event => setComment(event.target.value)}
                 />
 
                 <footer className="flex gap-2 mt-2">
@@ -55,8 +70,9 @@ export function FeedbackContentStep({ feedbackType, onFeedbackTypeRestartedReque
 
                     <button
                         type="submit"
+                        disabled={ comment.length === 0 }
                         className="p-2 bg-brand-500 rounded-md border-transparent flex-1 flex justify-center items-center text-sm hover:bg-brand-300 
-                    focus: outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-zinc-900 focus:ring-brand-500 transition-colors "
+                    focus: outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-zinc-900 focus:ring-brand-500 transition-colors disabled:opacity-50 disabled:hover:bg-brand-500"
                     >
                         Enviar Feedback
                     </button>
